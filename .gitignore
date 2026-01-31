@@ -1,12 +1,17 @@
 # Environment variables
 .env
-.env.*
 
-# Python
-__pycache__/
-*.pyc
+
+# Virtual environments
 .venv/
 venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Gradio
+.gradio/
 
 # OS files
 .DS_Store
