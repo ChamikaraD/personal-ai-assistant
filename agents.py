@@ -4,7 +4,8 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
 from langchain_tavily import TavilySearch
 
-from system_prompts import ROUTER_AGENT_SYSTEM_PROMPT, NEWS_AGENT_PROMPT, SCAM_PROMPT
+from system_prompts import ROUTER_AGENT_SYSTEM_PROMPT, NEWS_AGENT_PROMPT, SCAM_PROMPT, GENERAL_AGENT_PROMPT, \
+    WRITING_AGENT_PROMPT
 
 load_dotenv()
 
@@ -39,14 +40,61 @@ def scam_agent(state):
 
 
 def news_agent(state):
-    web_search_tool = TavilySearch(max_results=5)
+    search_tool = TavilySearch(max_results=5)
 
     agent = create_agent(
         model=llm,
         system_prompt=NEWS_AGENT_PROMPT,
-        tools=[web_search_tool]
-
+        tools=[search_tool]
     )
+
+    result = agent.invoke({
+        "messages": [
+            {"role": "user", "content": state["input"]}
+        ]
+    })
+
+    return {
+        "response": result["messages"][-1].content,
+        "agent": "news"
+    }
+
+def general_agent(state):
+    """
+        Handles general informational and explanatory questions.
+        """
+    prompt = ChatPromptTemplate.from_messages([
+        ("system", GENERAL_AGENT_PROMPT),
+        ("human", "{input}")
+    ])
+
+    chain = prompt | llm
+    result = chain.invoke({"input": state["input"]})
+
+    return {
+        "response": result.content,
+        "agent": "General Agent"
+    }
+
+def writing_agent(state):
+    """
+        Handles writing, rewriting, and text improvement tasks.
+        """
+    prompt = ChatPromptTemplate.from_messages([
+        ("system", WRITING_AGENT_PROMPT),
+        ("human", "{input}")
+    ])
+
+    chain = prompt | llm
+    result = chain.invoke({"input": state["input"]})
+
+    return {
+        "response": result.content,
+        "agent":"Writing Agent"
+    }
+
+
+
 
     result = agent.invoke({
         "messages" : [
