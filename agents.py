@@ -35,7 +35,8 @@ def scam_agent(state):
     scam_chain = prompt | llm
     scam_response  = scam_chain.invoke({"input": state["input"]})
 
-    return {"response" : scam_response}
+    return {"response" : scam_response,
+            "agent": "scam"}
 
 
 

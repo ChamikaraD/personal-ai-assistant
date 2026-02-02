@@ -6,7 +6,6 @@ from agents import router_agent, news_agent, scam_agent, general_agent, writing_
 from guardrails import input_guardrails_node
 
 
-
 class AgentState(TypedDict):
     input: str
     route: str
@@ -21,11 +20,11 @@ def input_decision(state: AgentState):
     return "router"
 
 def router_decision(state: AgentState):
-    return state["route"]   # "news" | "scam" | "general" | "write "
+    return state["route"]   # news, scam, general ,write
 
 graph = StateGraph(AgentState)
 
-# Nodes
+
 graph.add_node("input_guard", input_guardrails_node)
 graph.add_node("router", router_agent)
 graph.add_node("news_agent", news_agent)
@@ -34,10 +33,8 @@ graph.add_node("general_agent", general_agent)
 graph.add_node("writing_agent", writing_agent)
 
 
-# Entry
 graph.set_entry_point("input_guard")
 
-# Guard → router or END
 graph.add_conditional_edges(
     "input_guard",
     input_decision,
@@ -47,7 +44,7 @@ graph.add_conditional_edges(
     }
 )
 
-# Router → agents
+
 graph.add_conditional_edges(
     "router",
     router_decision,
@@ -59,12 +56,11 @@ graph.add_conditional_edges(
     }
 )
 
-# Agents → END
+
 graph.add_edge("news_agent", END)
 graph.add_edge("scam_agent", END)
 graph.add_edge("scam_agent", END)
 graph.add_edge("writing_agent", END)
 
 
-# Compile
 compiled_graph = graph.compile()
