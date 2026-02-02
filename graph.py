@@ -56,7 +56,6 @@ graph.add_conditional_edges(
     }
 )
 
-
 graph.add_edge("news_agent", END)
 graph.add_edge("scam_agent", END)
 graph.add_edge("scam_agent", END)
